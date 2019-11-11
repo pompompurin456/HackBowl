@@ -8,11 +8,10 @@
     
     import Foundation
     import Alamofire
-    import SwiftyJSON
     
     class RootViewModel {
         
-        func loginRepository(email: String, password: String, callback: @escaping (JSON) -> Void) {
+        func loginRepository(email: String, password: String, callback: @escaping (User) -> Void) {
             
             let url = URL(string: "http://feb54174.ngrok.io/api_sessions/login")!
             
@@ -27,10 +26,11 @@
                     
                     switch response.result {
                     case .success(let response):
-                        let json = JSON(response)
-                        print(json, "json")
-                        callback(json)
-                    //NOTE:Errorの処理を書いていく→てか欲しい
+                        guard let data = response.data else { return }
+                        print(data,"data")
+                        guard let userToken = try? JSONDecoder().decode(User.self, from: data) else { return }
+                        print(userToken, "foodList")
+                        callback(userToken)
                     case .failure(let error):
                         print(error, "error")
                     }
